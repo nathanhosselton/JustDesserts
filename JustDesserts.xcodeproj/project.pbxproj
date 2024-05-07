@@ -11,6 +11,7 @@
 		0D35C7162BEA7DF200121CF6 /* DessertsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D35C7152BEA7DF200121CF6 /* DessertsListView.swift */; };
 		0D35C71A2BEA7DF400121CF6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0D35C7192BEA7DF400121CF6 /* Assets.xcassets */; };
 		0D35C71D2BEA7DF400121CF6 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0D35C71C2BEA7DF400121CF6 /* Preview Assets.xcassets */; };
+		0D35C7262BEA868F00121CF6 /* JDKit in Frameworks */ = {isa = PBXBuildFile; productRef = 0D35C7252BEA868F00121CF6 /* JDKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +20,7 @@
 		0D35C7152BEA7DF200121CF6 /* DessertsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DessertsListView.swift; sourceTree = "<group>"; };
 		0D35C7192BEA7DF400121CF6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0D35C71C2BEA7DF400121CF6 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		0D35C7232BEA835000121CF6 /* JDKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = JDKit; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -26,6 +28,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0D35C7262BEA868F00121CF6 /* JDKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -35,8 +38,10 @@
 		0D35C7072BEA7DF200121CF6 = {
 			isa = PBXGroup;
 			children = (
-				0D35C7122BEA7DF200121CF6 /* JustDesserts */,
+				0D35C7122BEA7DF200121CF6 /* App */,
+				0D35C7232BEA835000121CF6 /* JDKit */,
 				0D35C7112BEA7DF200121CF6 /* Products */,
+				0D35C7242BEA868F00121CF6 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -48,7 +53,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		0D35C7122BEA7DF200121CF6 /* JustDesserts */ = {
+		0D35C7122BEA7DF200121CF6 /* App */ = {
 			isa = PBXGroup;
 			children = (
 				0D35C7132BEA7DF200121CF6 /* JustDessertsApp.swift */,
@@ -56,7 +61,7 @@
 				0D35C7192BEA7DF400121CF6 /* Assets.xcassets */,
 				0D35C71B2BEA7DF400121CF6 /* Preview Content */,
 			);
-			path = JustDesserts;
+			path = App;
 			sourceTree = "<group>";
 		};
 		0D35C71B2BEA7DF400121CF6 /* Preview Content */ = {
@@ -65,6 +70,13 @@
 				0D35C71C2BEA7DF400121CF6 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		0D35C7242BEA868F00121CF6 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -83,6 +95,9 @@
 			dependencies = (
 			);
 			name = JustDesserts;
+			packageProductDependencies = (
+				0D35C7252BEA868F00121CF6 /* JDKit */,
+			);
 			productName = JustDesserts;
 			productReference = 0D35C7102BEA7DF200121CF6 /* JustDesserts.app */;
 			productType = "com.apple.product-type.application";
@@ -271,7 +286,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"JustDesserts/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"App/Preview Content\"";
 				DEVELOPMENT_TEAM = GTZ6E2N5Z9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -304,7 +319,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"JustDesserts/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"App/Preview Content\"";
 				DEVELOPMENT_TEAM = GTZ6E2N5Z9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -352,6 +367,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		0D35C7252BEA868F00121CF6 /* JDKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = JDKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 0D35C7082BEA7DF200121CF6 /* Project object */;
 }
