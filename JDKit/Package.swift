@@ -7,18 +7,24 @@ let package = Package(
   name: "JDKit",
   platforms: [.iOS(.v15)],
   products: [
-    // Products define the executables and libraries a package produces, making them visible to other packages.
     .library(
       name: "JDKit",
-      targets: ["Model"]),
+      // - Note: The MockServiceImplementation module should be excluded from release builds, but this
+      // configuration is not currently available in SPM (pending: https://github.com/apple/swift-evolution/blob/main/proposals/0273-swiftpm-conditional-target-dependencies.md).
+      // Though it can be manually excluded using a separate library, some custom project configurations,
+      // and run script, I've elected to forgo these complications for this test project.
+      targets: ["Model", "MockServiceImplementations"]),
   ],
   targets: [
-    // Targets are the basic building blocks of a package, defining a module or a test suite.
-    // Targets can depend on other targets in this package and products from dependencies.
     .target(
       name: "Model"),
-    .testTarget(
-      name: "JDKitTests",
       dependencies: ["Model"]),
+    .target(
+      name: "MockServiceImplementations",
+      dependencies: ["Model"],
+      resources: [.process("Fixtures")]),
+    .testTarget(
+      name: "ModelTests",
+      dependencies: ["Model", "MockServiceImplementations"]),
   ]
 )
