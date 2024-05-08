@@ -17,6 +17,7 @@ public final class Model: ObservableObject {
   /// The storage for tasks created by the Model which are otherwise cancelled upon release.
   private var pendingTasks = Set<AnyCancellable>()
 
+  /// Asks this model to asynchronously fetch new dessert results, publishing them to `desserts` when complete.
   public func reloadDesserts() {
     struct DessertsResponse: Decodable {
       let meals: [DessertResult]

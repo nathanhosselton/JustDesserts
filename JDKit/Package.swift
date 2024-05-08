@@ -13,11 +13,13 @@ let package = Package(
       // configuration is not currently available in SPM (pending: https://github.com/apple/swift-evolution/blob/main/proposals/0273-swiftpm-conditional-target-dependencies.md).
       // Though it can be manually excluded using a separate library, some custom project configurations,
       // and run script, I've elected to forgo these complications for this test project.
-      targets: ["Model", "MockServiceImplementations"]),
+      targets: ["Model", "ServiceImplementations", "MockServiceImplementations"]),
   ],
   targets: [
     .target(
       name: "Model"),
+    .target(
+      name: "ServiceImplementations",
       dependencies: ["Model"]),
     .target(
       name: "MockServiceImplementations",
