@@ -32,9 +32,14 @@ public final class Model: ObservableObject {
 
       do {
         let decoded = try JSONDecoder().decode(DessertsResponse.self, from: data)
+        // - Note: The API currently returns results already sorted alphabetically, so this operation
+        // is wasted. However, since alphabetical sorting is a stated requirement of the app, and since
+        // this API is not owned nor controlled internally and therefore could change behavior, manual
+        // sorting to guarantee expectations is warranted.
+        let desserts = decoded.meals.sorted(by: <)
 
         DispatchQueue.main.async {
-          self.desserts = decoded.meals
+          self.desserts = desserts
         }
       } catch {
         assertionFailure("🛑 Failed to decode desserts response: \(error)")
