@@ -1,6 +1,15 @@
 {
   "meals": [
     {
+      "strMeal": "",
+      "strMealThumb": "https://www.themealdb.com/images/media/meals/adxcbq1619787919.jpg",
+      "idMeal": "-2"
+    },
+    {
+      "strMealThumb": "https://www.themealdb.com/images/media/meals/adxcbq1619787919.jpg",
+      "idMeal": "-1"
+    },
+    {
       "strMeal": "Apam balik",
       "strMealThumb": "https://www.themealdb.com/images/media/meals/adxcbq1619787919.jpg",
       "idMeal": "53049"

@@ -19,8 +19,34 @@ public final class Model: ObservableObject {
 
   /// Asks this model to asynchronously fetch new dessert results, publishing them to `desserts` when complete.
   public func reloadDesserts() {
+    /// Represents the raw JSON object response from the API.
     struct DessertsResponse: Decodable {
       let meals: [DessertResult]
+
+      enum CodingKeys: CodingKey {
+        case meals
+      }
+
+      init(from decoder: any Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        var container = try values.nestedUnkeyedContainer(forKey: .meals)
+
+        // Filter out desserts which fail to decode
+        // - Note: The API does not currently return any results which are missing required fields,
+        // but as with any external API, it may become unreliable and our app should not completely fail.
+        var meals = [DessertResult]()
+        while !container.isAtEnd {
+          if let decoded = try? container.decode(DessertResult.self) {
+            meals.append(decoded)
+          } else {
+            // Consume the malformed entry so that iteration may proceed
+            struct IgnoredMalformedEntry: Decodable {}
+            _ = try container.decode(IgnoredMalformedEntry.self)
+          }
+        }
+
+        self.meals = meals
+      }
     }
 
     let allDesserts = URLRequest(url: URL(string: "https://www.themealdb.com/api/json/v1/1/filter.php?c=Dessert")!)
@@ -32,10 +58,10 @@ public final class Model: ObservableObject {
 
       do {
         let decoded = try JSONDecoder().decode(DessertsResponse.self, from: data)
-        // - Note: The API currently returns results already sorted alphabetically, so this operation
-        // is wasted. However, since alphabetical sorting is a stated requirement of the app, and since
-        // this API is not owned nor controlled internally and therefore could change behavior, manual
-        // sorting to guarantee expectations is warranted.
+        // - Note: The API currently returns results sorted (mostly) alphabetically, so this operation
+        // is (somewhat) wasted. However, since alphabetical sorting is a stated requirement of the app,
+        // and since this API is not owned nor controlled internally and therefore could change behavior,
+        // manual sorting to guarantee expectations is warranted.
         let desserts = decoded.meals.sorted(by: <)
 
         DispatchQueue.main.async {
