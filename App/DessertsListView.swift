@@ -1,21 +1,26 @@
 import SwiftUI
 import Model
 
+/// The root view of the app displaying the list of desserts.
 struct DessertsListView: View {
   @EnvironmentObject var model: Model
 
   var body: some View {
-    List(model.desserts) { item in
-      HStack {
-        AsyncImage(url: item.thumbnail) { image in
-          image.resizable()
-            .aspectRatio(1, contentMode: .fit)
-        } placeholder: {
-          Rectangle().overlay(Color.gray)
-        }
-        .frame(width: 100, height: 100)
+    NavigationView {
+      List(model.desserts) { item in
+        NavigationLink(destination: DessertDetailView(dessert: item)) {
+          HStack {
+            AsyncImage(url: item.thumbnail) { image in
+              image.resizable()
+                .aspectRatio(1, contentMode: .fit)
+            } placeholder: {
+              Rectangle().overlay(Color.gray)
+            }
+            .frame(width: 100, height: 100)
 
-        Text(item.name)
+            Text(item.name)
+          }
+        }
       }
     }
     .onAppear {

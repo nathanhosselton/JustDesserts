@@ -18,6 +18,8 @@ public extension Services {
   /// Returns a static fixture object of the corresponding type for use in preview UI.
   func fixture<T>() -> T where T: Decodable {
     switch T.self {
+    case is DessertResult.Type:
+      return (try! JSONDecoder().decode(DessertResult.self, from: .fixture(named: "\(DessertResult.self).json"))) as! T
     default:
       fatalError("🛑 Missing support for fixture of type \(T.self)")
     }
