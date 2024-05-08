@@ -95,13 +95,14 @@ public final class Model: ObservableObject {
             if let detailResult = decoded.meals.first {
               continuation.resume(returning: detailResult)
             } else {
-              assertionFailure("🛑 Dessert detail result was empty no error handling has been implemented.")
+              assertionFailure("🛑 Dessert detail result was empty and no error handling has been implemented.")
               continuation.resume(throwing: NSError())
             }
           }
         } catch {
-          assertionFailure("🛑 Failed to decode desserts response: \(error)")
-          return DispatchQueue.main.async { continuation.resume(throwing: error) }
+          DispatchQueue.main.async {
+            continuation.resume(throwing: error)
+          }
         }
       }.store(in: &pendingTasks)
     }
