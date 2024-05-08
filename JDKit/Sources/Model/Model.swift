@@ -41,4 +41,38 @@ public final class Model: ObservableObject {
       }
     }.store(in: &pendingTasks)
   }
+
+  /// Requests the full details for the provided dessert and returns the result.
+  public func getDetails(for dessert: DessertResult) async throws -> DessertDetail {
+    struct DetailResponse: Decodable {
+      let meals: [DessertDetail]
+    }
+
+    let details = URLRequest(url: URL(string: "https://www.themealdb.com/api/json/v1/1/lookup.php?i=\(dessert.id)")!)
+
+    return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<DessertDetail, Error>) in
+      services.networkService.fetch(request: details) { (data, response, error) in
+        guard let data = data, (response as? HTTPURLResponse)?.statusCode == 200, error == nil else {
+          assertionFailure("🛑 Failed to get dessert details and no error handling has been implemented.")
+          return DispatchQueue.main.async { continuation.resume(throwing: NSError()) }
+        }
+
+        do {
+          let decoded = try JSONDecoder().decode(DetailResponse.self, from: data)
+
+          DispatchQueue.main.async {
+            if let detailResult = decoded.meals.first {
+              continuation.resume(returning: detailResult)
+            } else {
+              assertionFailure("🛑 Dessert detail result was empty no error handling has been implemented.")
+              continuation.resume(throwing: NSError())
+            }
+          }
+        } catch {
+          assertionFailure("🛑 Failed to decode desserts response: \(error)")
+          return DispatchQueue.main.async { continuation.resume(throwing: error) }
+        }
+      }.store(in: &pendingTasks)
+    }
+  }
 }

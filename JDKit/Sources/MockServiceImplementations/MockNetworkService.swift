@@ -27,6 +27,10 @@ final class MockNetworkService: NetworkService {
     // - GET all desserts
     case ("GET", "www.themealdb.com", "/api/json/v1/1/filter.php", "c=Dessert"):
       completion(.fixture(named: "filter_desserts.json"), .successResponse(url), nil)
+    // - GET item details
+    case ("GET", "www.themealdb.com", "/api/json/v1/1/lookup.php", _):
+      // item identifier is ignored and a static item is provided
+      completion(.fixture(named: "lookup.json"), .successResponse(url), nil)
     default:
       completion(nil, .notFoundResponse(url), URLError(.unsupportedURL))
     }
