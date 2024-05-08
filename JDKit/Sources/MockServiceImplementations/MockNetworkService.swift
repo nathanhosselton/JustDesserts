@@ -35,19 +35,6 @@ final class MockNetworkService: NetworkService {
   }
 }
 
-private extension Data {
-  static func fixture(named name: String) -> Data {
-    guard let urlToFixture = Bundle.module.url(forResource: name, withExtension: nil),
-          let fixtureData = try? Data(contentsOf: urlToFixture)
-    else {
-      assertionFailure("🛑 No fixture named \(name) was found.")
-      return Data()
-    }
-
-    return fixtureData
-  }
-}
-
 private extension URLResponse {
   static func successResponse(_ url: URL) -> URLResponse {
     HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
