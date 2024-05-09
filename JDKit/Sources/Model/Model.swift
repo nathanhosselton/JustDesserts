@@ -51,60 +51,86 @@ public final class Model: ObservableObject {
 
     let allDesserts = URLRequest(url: URL(string: "https://www.themealdb.com/api/json/v1/1/filter.php?c=Dessert")!)
 
-    services.networkService.fetch(request: allDesserts) { (data, response, error) in
-      guard let data = data, (response as? HTTPURLResponse)?.statusCode == 200, error == nil else {
-        fatalError("🛑 Failed to get desserts and no error handling has been implemented.")
-      }
+    services.networkService.fetch(request: allDesserts, completion: networkServiceResultCompletionAdapter { result in
+      switch result {
+      case .success(let data):
+        do {
+          let decoded = try JSONDecoder().decode(DessertsResponse.self, from: data)
+          // - Note: The API currently returns results sorted (mostly) alphabetically, but as with any
+          // external API, it may become (more) unreliable and our app should maintain user expectations.
+          let desserts = decoded.meals.sorted(by: <)
 
-      do {
-        let decoded = try JSONDecoder().decode(DessertsResponse.self, from: data)
-        // - Note: The API currently returns results sorted (mostly) alphabetically, so this operation
-        // is (somewhat) wasted. However, since alphabetical sorting is a stated requirement of the app,
-        // and since this API is not owned nor controlled internally and therefore could change behavior,
-        // manual sorting to guarantee expectations is warranted.
-        let desserts = decoded.meals.sorted(by: <)
-
-        DispatchQueue.main.async {
-          self.desserts = desserts
+          DispatchQueue.main.async {
+            self.desserts = desserts
+          }
+        } catch {
+          assertionFailure("🛑 Failed to decode desserts response: \(error)")
         }
-      } catch {
-        assertionFailure("🛑 Failed to decode desserts response: \(error)")
+      case .failure(let error):
+        assertionFailure("🛑 Failed to get desserts and no error handling has been implemented.")
       }
-    }.store(in: &pendingTasks)
+    }).store(in: &pendingTasks)
   }
 
   /// Requests the full details for the provided dessert and returns the result.
   public func getDetails(for dessert: DessertResult) async throws -> DessertDetail {
     struct DetailResponse: Decodable {
       let meals: [DessertDetail]
+
+      enum CodingKeys: CodingKey {
+        case meals
+      }
     }
 
     let details = URLRequest(url: URL(string: "https://www.themealdb.com/api/json/v1/1/lookup.php?i=\(dessert.id)")!)
 
     return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<DessertDetail, Error>) in
-      services.networkService.fetch(request: details) { (data, response, error) in
-        guard let data = data, (response as? HTTPURLResponse)?.statusCode == 200, error == nil else {
-          assertionFailure("🛑 Failed to get dessert details and no error handling has been implemented.")
-          return DispatchQueue.main.async { continuation.resume(throwing: NSError()) }
-        }
+      services.networkService.fetch(request: details, completion: networkServiceResultCompletionAdapter { result in
+        switch result {
+        case .success(let data):
+          do {
+            let decoded = try JSONDecoder().decode(DetailResponse.self, from: data)
 
-        do {
-          let decoded = try JSONDecoder().decode(DetailResponse.self, from: data)
-
-          DispatchQueue.main.async {
             if let detailResult = decoded.meals.first {
-              continuation.resume(returning: detailResult)
+              DispatchQueue.main.async {
+                continuation.resume(returning: detailResult)
+              }
             } else {
-              assertionFailure("🛑 Dessert detail result was empty and no error handling has been implemented.")
-              continuation.resume(throwing: NSError())
+              throw DecodingError.dataCorrupted(.init(codingPath: [DetailResponse.CodingKeys.meals], debugDescription: "Unexpectedly empty details response"))
+            }
+          } catch {
+            DispatchQueue.main.async {
+              continuation.resume(throwing: error)
             }
           }
-        } catch {
+        case .failure(let error):
           DispatchQueue.main.async {
             continuation.resume(throwing: error)
           }
         }
-      }.store(in: &pendingTasks)
+      }).store(in: &pendingTasks)
+    }
+  }
+}
+
+/// Adapts standard `NetworkService` completion handlers by consolidating boilerplate logic into a `Result`.
+private func networkServiceResultCompletionAdapter(completion: @escaping (Result<Data, NetworkServiceError>) -> Void) -> (Data?, URLResponse?, NetworkServiceError?) -> Void {
+  return { (d, r, e) in
+    switch (d, r, e) {
+    case (.some(let data), .some(_ as HTTPURLResponse), .none):
+      // - Valid success response
+      completion(.success(data))
+    case (_, _, .some(let error)):
+      // - Known error response
+      completion(.failure(error))
+    case (_, .some(let response), .none):
+      // - Unrecognized unexpected response (Typically a developer error)
+      assertionFailure("🛑 NetworkService task completed with an unexpected response: \(response.debugDescription)")
+      completion(.failure(.unknownUnhandled(NSError())))
+    case (_, .none, .none):
+      // - Impossible according to API expectations
+      assertionFailure("🛑 NetworkService failed to provide either a response or an error.")
+      completion(.failure(.unknownUnhandled(NSError())))
     }
   }
 }
