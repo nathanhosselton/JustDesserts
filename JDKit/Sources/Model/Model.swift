@@ -19,49 +19,17 @@ public final class Model: ObservableObject {
 
   /// Asks this model to asynchronously fetch new dessert results, publishing them to `desserts` when complete.
   public func reloadDesserts() {
-    /// Represents the raw JSON object response from the API.
-    struct DessertsResponse: Decodable {
-      let meals: [DessertResult]
 
-      enum CodingKeys: CodingKey {
-        case meals
-      }
+    let getDesserts = GetDesserts()
 
-      init(from decoder: any Decoder) throws {
-        let values = try decoder.container(keyedBy: CodingKeys.self)
-        var container = try values.nestedUnkeyedContainer(forKey: .meals)
-
-        // Filter out desserts which fail to decode
-        // - Note: The API does not currently return any results which are missing required fields,
-        // but as with any external API, it may become unreliable and our app should not completely fail.
-        var meals = [DessertResult]()
-        while !container.isAtEnd {
-          if let decoded = try? container.decode(DessertResult.self) {
-            meals.append(decoded)
-          } else {
-            // Consume the malformed entry so that iteration may proceed
-            struct IgnoredMalformedEntry: Decodable {}
-            _ = try container.decode(IgnoredMalformedEntry.self)
-          }
-        }
-
-        self.meals = meals
-      }
-    }
-
-    let allDesserts = URLRequest(url: URL(string: "https://www.themealdb.com/api/json/v1/1/filter.php?c=Dessert")!)
-
-    services.networkService.fetch(request: allDesserts, completion: networkServiceResultCompletionAdapter { result in
+    services.networkService.fetch(request: getDesserts.urlRequest, completion: networkServiceResultCompletionAdapter { result in
       switch result {
       case .success(let data):
         do {
-          let decoded = try JSONDecoder().decode(DessertsResponse.self, from: data)
-          // - Note: The API currently returns results sorted (mostly) alphabetically, but as with any
-          // external API, it may become (more) unreliable and our app should maintain user expectations.
-          let desserts = decoded.meals.sorted(by: <)
+          let decoded = try getDesserts.decode(data: data, using: JSONDecoder())
 
           DispatchQueue.main.async {
-            self.desserts = desserts
+            self.desserts = decoded
           }
         } catch {
           assertionFailure("🛑 Failed to decode desserts response: \(error)")
@@ -77,25 +45,17 @@ public final class Model: ObservableObject {
   /// - Returns: A `DessertDetail` object. Throws `ModelError.permanentResponseFailure`
   /// when no details are available for the provided dessert.
   public func getDetails(for dessert: DessertResult) async throws -> DessertDetail {
-    struct DetailResponse: Decodable {
-      let meals: [DessertDetail]
-    }
-
-    let details = URLRequest(url: URL(string: "https://www.themealdb.com/api/json/v1/1/lookup.php?i=\(dessert.id)")!)
+    let getDetails = GetDessertDetail(dessertId: dessert.id)
 
     return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<DessertDetail, Error>) in
-      services.networkService.fetch(request: details, completion: networkServiceResultCompletionAdapter { result in
+      services.networkService.fetch(request: getDetails.urlRequest, completion: networkServiceResultCompletionAdapter { result in
         switch result {
         case .success(let data):
           do {
-            let decoded = try JSONDecoder().decode(DetailResponse.self, from: data)
+            let decoded = try getDetails.decode(data: data, using: JSONDecoder())
 
-            if let detailResult = decoded.meals.first {
-              DispatchQueue.main.async {
-                continuation.resume(returning: detailResult)
-              }
-            } else {
-              throw ModelError.permanentResponseFailure
+            DispatchQueue.main.async {
+              continuation.resume(returning: decoded)
             }
           } catch is DecodingError {
             DispatchQueue.main.async {

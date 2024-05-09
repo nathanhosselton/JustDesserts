@@ -93,3 +93,29 @@ public struct DessertDetail: Decodable, Identifiable {
     self.ingredients = ingredients
   }
 }
+
+//- MARK: Operation
+/// An operation which fetches the full details of a specific dessert from the remote API.
+struct GetDessertDetail: Operation {
+  /// The id of the  `DessertResult` whose details this operation will request.
+  let dessertId: String
+
+  var urlRequest: URLRequest {
+    URLRequest(url: URL(string: "https://www.themealdb.com/api/json/v1/1/lookup.php?i=\(dessertId)")!)
+  }
+
+  /// Represents the raw JSON object response from the API.
+  private struct DetailResponse: Decodable {
+    let meals: [DessertDetail]
+  }
+
+  func decode(data: Data, using decoder: JSONDecoder) throws -> DessertDetail {
+    let decoded = try decoder.decode(DetailResponse.self, from: data)
+
+    if let detailResult = decoded.meals.first {
+      return detailResult
+    } else {
+      throw ModelError.permanentResponseFailure
+    }
+  }
+}
