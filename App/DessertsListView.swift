@@ -11,24 +11,36 @@ struct DessertsListView: View {
 
   var body: some View {
     NavigationView {
-      List(model.desserts) { item in
-        NavigationLink(destination: DessertDetailView(dessert: item)) {
-          HStack {
-            AsyncImage(url: item.thumbnail) { image in
-              image.resizable()
-                .aspectRatio(1, contentMode: .fit)
-            } placeholder: {
-              Rectangle().overlay(Color.gray)
-            }
-            .frame(width: 100, height: 100)
+      if !model.desserts.isEmpty {
+        // - Desserts list
+        List(model.desserts) { item in
+          NavigationLink(destination: DessertDetailView(dessert: item)) {
+            HStack {
+              AsyncImage(url: item.thumbnail) { image in
+                image.resizable()
+                  .aspectRatio(1, contentMode: .fit)
+              } placeholder: {
+                Rectangle().overlay(Color.gray)
+              }
+              .frame(width: 100, height: 100)
 
-            Text(item.name)
+              Text(item.name)
+            }
           }
         }
-      }
-      .refreshable {
-        //TODO: If already refreshing, await current refresh
-        await refresh()
+        .refreshable {
+          //TODO: If already refreshing, await current refresh
+          await refresh()
+        }
+      } else if model.isFetchingDesserts {
+        // Refreshing
+        ProgressView()
+      } else {
+        // Refresh failed and retry was cancelled
+        Button("Refresh") {
+          Task { await refresh() }
+        }
+        .buttonStyle(.bordered)
       }
     }
     .task {
