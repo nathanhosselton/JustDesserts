@@ -15,6 +15,10 @@ public struct Services {
 public protocol NetworkService {
   /// Executes an asynchronous HTTP request with a function to be called upon completion.
   ///
+  /// Performs lightweight error detection, including for non-success HTTP status codes, mapping known errors to a
+  /// `NetworkServiceError` within the completion while leaving the data and response objects unmodified.
+  /// Callers can reasonably expect that the completion will always receive a response object or an error (or both).
+  ///
   /// - Returns: An object which may be used to cancel an in-progress request.
-  func fetch(request: URLRequest, completion: @escaping (Data?, URLResponse?, Error?) -> Void) -> AnyCancellable
+  func fetch(request: URLRequest, completion: @escaping (Data?, URLResponse?, NetworkServiceError?) -> Void) -> AnyCancellable
 }

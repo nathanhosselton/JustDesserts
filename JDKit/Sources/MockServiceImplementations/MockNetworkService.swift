@@ -12,14 +12,14 @@ public extension Services {
 
 /// An object implementing `NetworkService` for the purpose of providing mock data to the Model.
 final class MockNetworkService: NetworkService {
-  func fetch(request: URLRequest, completion: @escaping (Data?, URLResponse?, (any Error)?) -> Void) -> AnyCancellable {
+  func fetch(request: URLRequest, completion: @escaping (Data?, URLResponse?, NetworkServiceError?) -> Void) -> AnyCancellable {
     /// The provided completion function wrapped in a dispatch to maintain the async expectations of this API.
-    let completion: (Data?, URLResponse?, Error?) -> Void = { (d, r, e) in
+    let completion: (Data?, URLResponse?, NetworkServiceError?) -> Void = { (d, r, e) in
       DispatchQueue.main.async(execute: { completion(d, r, e) })
     }
 
     guard let method = request.httpMethod, let url = request.url else {
-      completion(nil, nil, URLError(.badURL))
+      completion(nil, nil, .unknownUnhandled(URLError(.badURL)))
       return AnyCancellable {}
     }
 
@@ -32,7 +32,7 @@ final class MockNetworkService: NetworkService {
       // item identifier is ignored and a static item is provided
       completion(.fixture(named: "lookup.json"), .successResponse(url), nil)
     default:
-      completion(nil, .notFoundResponse(url), URLError(.unsupportedURL))
+      completion(nil, .notFoundResponse(url), .unknownUnhandled(URLError(.unsupportedURL)))
     }
 
     return AnyCancellable {}
