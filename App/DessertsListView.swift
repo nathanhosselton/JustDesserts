@@ -15,19 +15,10 @@ struct DessertsListView: View {
         // - Desserts list
         List(model.desserts) { item in
           NavigationLink(destination: DessertDetailView(dessert: item)) {
-            HStack {
-              AsyncImage(url: item.thumbnail) { image in
-                image.resizable()
-                  .aspectRatio(1, contentMode: .fit)
-              } placeholder: {
-                Rectangle().overlay(Color.gray)
-              }
-              .frame(width: 100, height: 100)
-
-              Text(item.name)
-            }
+            DessertResultCell(item: item)
           }
         }
+        .navigationTitle("Desserts")
         .refreshable {
           //TODO: If already refreshing, await current refresh
           await refresh()
@@ -54,6 +45,21 @@ struct DessertsListView: View {
     }, message: { error in
       Text(error.localizedDescription)
     })
+  }
+
+  /// Builds the cell for an individual `DessertResult`.
+  private func DessertResultCell(item: DessertResult) -> some View {
+    HStack {
+      AsyncImage(url: item.thumbnail) { image in
+        image.resizable()
+          .aspectRatio(1, contentMode: .fit)
+      } placeholder: {
+        Rectangle().overlay(Color.gray)
+      }
+      .frame(width: 100, height: 100)
+
+      Text(item.name)
+    }
   }
 
   /// Asks the `model` to refresh the contents of its `desserts`.
