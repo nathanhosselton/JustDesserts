@@ -5,6 +5,8 @@ import Combine
 public final class Model: ObservableObject {
   /// The list of desserts to be displayed to the user.
   @Published public private(set) var desserts: [DessertResult] = []
+  /// Indicates when a recent call to `refreshDesserts()` is still in-flight.
+  @Published public private(set) var isFetchingDesserts = false
 
   /// The services utilized by this model for fetching and operating on data.
   let services: Services
@@ -17,7 +19,9 @@ public final class Model: ObservableObject {
   /// Asks this model to fetch new dessert results, publishing them to `desserts` when complete.
   @discardableResult 
   @MainActor public func refreshDesserts() async throws -> [DessertResult] {
+    isFetchingDesserts = true
     self.desserts = try await request(GetDesserts())
+    isFetchingDesserts = false
 
     return desserts
   }
