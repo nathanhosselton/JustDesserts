@@ -3,18 +3,12 @@ import XCTest
 import MockServiceImplementations
 
 final class ModelTests: XCTestCase {
-  func test_reloadDesserts() throws {
-    // Given a newly initialized Model and an expectation that awaits the second desserts change
+  func test_refreshDesserts() async throws {
+    // Given a newly initialized Model
     let model = Model(services: .mock())
-    let reloadComplete = expectation(description: "model.desserts should emit 2 values")
-    let cancellable = model.$desserts
-      .dropFirst() // The initial empty value received immediately upon sink
-      .sink { _ in reloadComplete.fulfill() }
 
-    // When reloadDesserts() completes
-    model.reloadDesserts()
-    wait(for: [reloadComplete], timeout: 5)
-    cancellable.cancel()
+    // When refreshDesserts() completes
+    try await model.refreshDesserts()
 
     // Then model.desserts should contain values
     XCTAssert(!model.desserts.isEmpty)

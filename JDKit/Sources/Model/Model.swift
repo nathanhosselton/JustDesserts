@@ -14,17 +14,12 @@ public final class Model: ObservableObject {
     self.services = services
   }
 
-  /// Asks this model to asynchronously fetch new dessert results, publishing them to `desserts` when complete.
-  public func reloadDesserts() {
+  /// Asks this model to fetch new dessert results, publishing them to `desserts` when complete.
+  @discardableResult 
+  @MainActor public func refreshDesserts() async throws -> [DessertResult] {
+    self.desserts = try await request(GetDesserts())
 
-    request(GetDesserts()) { result in
-      switch result {
-      case .success(let desserts):
-        self.desserts = desserts
-      case .failure(let error):
-        assertionFailure("🛑 Failed to get desserts and no error handling has been implemented.")
-      }
-    }
+    return desserts
   }
 
   /// Requests the full details for the provided dessert and returns the result.
