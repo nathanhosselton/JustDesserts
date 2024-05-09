@@ -58,8 +58,8 @@ struct DessertDetailView: View {
             } else if let error = lastError {
               // An error occurred while fetching the dessert details
               switch error {
-              case is DecodingError:
-                // Permanent failure: We received the details but they were not well formed.
+              case ModelError.permanentResponseFailure:
+                // We received the details but they were not well formed.
                 //
                 // - Note: This state is essentially our handling of the case where a DessertResult
                 // from the /filter API call is well-formed, but the corresponding DessertDetail
@@ -82,7 +82,7 @@ struct DessertDetailView: View {
                 // to go this route rather than the alternative.
                 Text("Details for this dessert are\nnot currently available.")
               default:
-                // Temporary failure: Notify the user and allow them to retry.
+                // Notify the user and allow them to retry.
                 VStack(alignment: .center) {
                   Text("Failed while retrieving this dessert.")
                   Button("Retry", action: retrieveDetails)

@@ -73,13 +73,12 @@ public final class Model: ObservableObject {
   }
 
   /// Requests the full details for the provided dessert and returns the result.
+  ///
+  /// - Returns: A `DessertDetail` object. Throws `ModelError.permanentResponseFailure`
+  /// when no details are available for the provided dessert.
   public func getDetails(for dessert: DessertResult) async throws -> DessertDetail {
     struct DetailResponse: Decodable {
       let meals: [DessertDetail]
-
-      enum CodingKeys: CodingKey {
-        case meals
-      }
     }
 
     let details = URLRequest(url: URL(string: "https://www.themealdb.com/api/json/v1/1/lookup.php?i=\(dessert.id)")!)
@@ -96,7 +95,11 @@ public final class Model: ObservableObject {
                 continuation.resume(returning: detailResult)
               }
             } else {
-              throw DecodingError.dataCorrupted(.init(codingPath: [DetailResponse.CodingKeys.meals], debugDescription: "Unexpectedly empty details response"))
+              throw ModelError.permanentResponseFailure
+            }
+          } catch is DecodingError {
+            DispatchQueue.main.async {
+              continuation.resume(throwing: ModelError.permanentResponseFailure)
             }
           } catch {
             DispatchQueue.main.async {

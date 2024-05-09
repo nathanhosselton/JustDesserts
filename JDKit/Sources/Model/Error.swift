@@ -1,5 +1,24 @@
 import Foundation
 
+/// Represents an error which can occur within the Model.
+public enum ModelError: Swift.Error {
+  /// Indicates that the Model encountered a permanent failure while trying to provide requested data.
+  ///
+  /// This can occur when local expectations have not yet accounted for a response in the format received
+  /// and is generally unrecoverable. A standard `localizedDescription` is available for user display
+  /// though it is recommended that this error be detected and handled gracefully where possible.
+  ///
+  //TODO: Occurrences of this error should be forwarded to our bug report service.
+  case permanentResponseFailure
+
+  public var localizedDescription: String {
+    switch self {
+    case .permanentResponseFailure:
+      "Something went wrong and it's unlikely that retrying will help. Please contact support for assistance."
+    }
+  }
+}
+
 /// An Error type representing specific failures that a `NetworkService` is expected to communicate.
 public enum NetworkServiceError: Error {
   /// The request timed out before it could complete. This is most often a result of poor network connectivity,
