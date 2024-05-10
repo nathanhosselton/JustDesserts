@@ -12,7 +12,7 @@ let package = Package(
       // - Note: The MockServiceImplementation module should be excluded from release builds, but this
       // configuration is not currently available in SPM (pending: https://github.com/apple/swift-evolution/blob/main/proposals/0273-swiftpm-conditional-target-dependencies.md).
       // Though it can be manually excluded using a separate library, some custom project configurations,
-      // and run script, I've elected to forgo these complications for this test project.
+      // and run script, I've elected to forgo these complications for this exercise.
       targets: ["Model", "ServiceImplementations", "MockServiceImplementations"]),
   ],
   targets: [

@@ -13,7 +13,7 @@ extension URLSession: NetworkService {
 extension URLSessionTask: Cancellable
 {}
 
-//MARK: Error Handling
+//MARK: - Error Handling
 extension NetworkServiceError {
   /// An initializer which handles common HTTP response failures by mapping them to the corresponding
   /// `NetworkServiceError` value.

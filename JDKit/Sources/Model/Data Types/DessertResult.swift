@@ -12,6 +12,7 @@ public struct DessertResult: Decodable, Identifiable, Comparable {
     lhs.name < rhs.name
   }
 
+  //MARK: Custom decoding
   enum CodingKeys: String, CodingKey {
     case id = "idMeal", name = "strMeal", thumbnail = "strMealThumb"
   }
@@ -34,7 +35,7 @@ public struct DessertResult: Decodable, Identifiable, Comparable {
   }
 }
 
-//- MARK: Operation
+//MARK: - Operation
 /// An operation which fetches all desserts from the remote API.
 struct GetDesserts: Operation {
   var urlRequest: URLRequest {

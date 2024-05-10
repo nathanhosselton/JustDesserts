@@ -32,7 +32,7 @@ public enum NetworkServiceError: Error {
   /// A network failure occurred with a status code that does not currently map to a specific user-facing reason.
   case other(statusCode: Int)
   /// An error which does not yet have a concrete representation on this type. The error's `localizedDescription`
-  /// will be automatically included in the `message`.
+  /// will be automatically included in the underlying error's description.
   case unknownUnhandled(Error)
 
   public var localizedDescription: String {

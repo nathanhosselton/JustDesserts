@@ -8,9 +8,6 @@ public final class Model: ObservableObject {
   /// Indicates when a recent call to `refreshDesserts()` is still in-flight.
   @Published public private(set) var isFetchingDesserts = false
 
-  /// The services utilized by this model for fetching and operating on data.
-  let services: Services
-
   /// Initializes the `Model` with its required services.
   public init(services: Services) {
     self.services = services
@@ -35,13 +32,16 @@ public final class Model: ObservableObject {
   }
 
   //- MARK: Internal
+  /// The services utilized by this model for fetching and operating on data.
+  let services: Services
+
   /// The storage for tasks created by the Model which are otherwise cancelled upon release.
   private var pendingTasks = Set<AnyCancellable>()
 
   /// Executes a `NetworkService` fetch for the provided operation, automatically decoding and returning the public result type.
   ///
   /// This method adapts the most common use case of the `NetworkService` for requesting data and then decoding it. It provides
-  /// standard error handling (including communicating decoding failures as `ModelError.permanentResponseFailure` as a
+  /// standard error handling (including communicating decoding failures as `ModelError.permanentResponseFailure`) as a
   /// convenience.
   ///
   /// If you require different behavior, execute your request through the `services` object directly. Standard result mapping may still
@@ -56,7 +56,7 @@ public final class Model: ObservableObject {
   /// Always calls the completion on the main thread.
   ///
   /// This method adapts the most common use case of the `NetworkService` for requesting data and then decoding it. It provides
-  /// standard error handling (including communicating decoding failures as `ModelError.permanentResponseFailure` as well
+  /// standard error handling (including communicating decoding failures as `ModelError.permanentResponseFailure`) as well
   /// as main thread completion as a convenience.
   ///
   /// If you require different behavior, execute your request through the `services` object directly. Standard result mapping may still

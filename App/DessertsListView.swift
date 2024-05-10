@@ -4,7 +4,7 @@ import Model
 /// The root view of the app displaying the list of desserts.
 struct DessertsListView: View {
   /// The error received during the most recent call to `refresh()`, if any.
-  @State private var lastError: Error? = nil
+  @State private var lastError: DessertsListView.Error? = nil
   /// Whether or not `lastError` should be presented when non-nil.
   @State private var shouldPresentError = false
   @EnvironmentObject var model: Model
@@ -72,13 +72,16 @@ struct DessertsListView: View {
       try await model.refreshDesserts()
       // View will invalidate on model change
     } catch {
-      self.lastError = Error(title: "Couldn't fetch desserts", underlying: error)
+      self.lastError = DessertsListView.Error(title: "Couldn't fetch desserts", underlying: error)
       self.shouldPresentError = true
     }
   }
 
+  /// An error type to represent failures in this view.
   private struct Error: LocalizedError {
+    /// The title to be displayed for the error.
     let title: String
+    /// The actual error that occurred.
     let underlying: Swift.Error
 
     var errorDescription: String? {

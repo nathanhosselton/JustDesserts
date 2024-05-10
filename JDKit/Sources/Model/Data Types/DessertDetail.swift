@@ -83,6 +83,10 @@ public struct DessertDetail: Decodable, Identifiable {
     // Map the related series' of ingredients and measurements to a list of Ingredients
     var ingredients: [Ingredient] = []
     for (ingredientKey, measurementKey) in zip(CodingKeys.allIngredients, CodingKeys.allMeasurements) {
+      // - Note: Here we throw away any entries where at least one of ingredient or measurement is
+      // null or empty. This may be an overreach depending on user expectations (maybe it's valid
+      // for an ingredient to have no measurement?). Regardless, the loop continues even when an
+      // empty entry is detected, just in case there are remaining entries which are valid.
       if let ingredient = try? values.decode(String.self, forKey: ingredientKey),
          let measurement = try? values.decode(String.self, forKey: measurementKey),
          !ingredient.trimmingCharacters(in: .whitespaces).isEmpty,
@@ -94,7 +98,7 @@ public struct DessertDetail: Decodable, Identifiable {
   }
 }
 
-//- MARK: Operation
+//MARK: - Operation
 /// An operation which fetches the full details of a specific dessert from the remote API.
 struct GetDessertDetail: Operation {
   /// The id of the  `DessertResult` whose details this operation will request.
@@ -115,6 +119,7 @@ struct GetDessertDetail: Operation {
     if let detailResult = decoded.meals.first {
       return detailResult
     } else {
+      // Received an empty `meals` list in the response data, which is unexpected.
       throw ModelError.permanentResponseFailure
     }
   }

@@ -30,6 +30,7 @@ struct DessertDetailView: View {
             .font(.largeTitle.weight(.medium))
             .padding(.bottom, 20)
 
+          // - Fetched details
           Group {
             if let details = details {
               // - Ingredients and Steps
@@ -101,7 +102,7 @@ struct DessertDetailView: View {
       // launch and cache them in advance. This would have the advantage of both knowing
       // in advance if a DessertDetail will fail to decode, allowing us to throw away the
       // corresponding DessertResult before showing it to the user, as well as skipping
-      // a loading state when the user taps on a DessertResult entry in DessertListView.
+      // a loading state when the user taps on a DessertResult entry in DessertsListView.
       //
       // In reality, that lookup should rarely take longer than the transition time to
       // the DessertDetailView. And performing that many API requests simultaneously or
@@ -115,7 +116,7 @@ struct DessertDetailView: View {
       VStack(alignment: .center) {
         Text("Failed while retrieving this dessert.")
         Button("Retry", action: retrieveDetails)
-          .buttonStyle(BorderedButtonStyle())
+          .buttonStyle(.bordered)
       }
     }
   }
